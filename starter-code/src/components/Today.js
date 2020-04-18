@@ -1,19 +1,19 @@
-import React ,  { Component } from "react"
+import React, { Component } from "react"
 
 
 
 
-class Today extends Component{
+class Today extends Component {
 
 
-render(){
+  render() {
 
-    return(
-     <ul>
-       <li>{this.props.name} + {this.props.cal} + {this.props.q} </li>  
-     </ul>
+    return (
+      <ul>
+        <li> {this.props.q}  {this.props.name} = {this.props.cal} calories  </li>
+      </ul>
     )
-}
+  }
 
 }
 

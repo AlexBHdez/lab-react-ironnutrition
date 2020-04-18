@@ -9,24 +9,39 @@ import Today from "./components/Today";
 
 class App extends Component {
   constructor(props) {
-     super(props);
+    super(props);
     this.state = {
-      allfood: JSON.parse(localStorage.getItem("data")),
+      allfood: foods,
       img: "",
       SearchValue: "",
       nameAdd: "",
       calAdd: "",
       list: [],
-      canti : 1
+      canti: 1,
+      totalCalories: 0
     };
   }
-  
-cantidad = (e) => {
- this.setState({
-   [e.target.name] : e.target.value,
+
+
+  componentDidMount() {
+
+    if (!localStorage.getItem("data")) {
+      this.setState({
+        allfood: foods,
+      })
+    } else {
+      this.setState({
+        allfood: JSON.parse(localStorage.getItem("data")),
+      })
+    }
+
+  }
+  cantidad = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
     });
 
-}
+  }
 
   handleSearch = (e) => {
     this.setState({
@@ -58,20 +73,27 @@ cantidad = (e) => {
       [e.target.name]: e.target.value,
     });
   };
+  addCal = (valor) => {
 
+
+    this.setState({
+      totalCalories: this.state.totalCalories += valor.calories * this.state.canti
+
+    });
+  };
   addToList = (valor) => {
-  
- this.obj={
-  name:valor.name,
-  quantity: this.state.canti,
-  calories: valor.calories
 
-}
+    this.obj = {
+      name: valor.name,
+      quantity: this.state.canti,
+      calories: valor.calories * this.state.canti,
+
+    }
 
     this.setState({
       list: [...this.state.list, this.obj],
     });
-
+    this.addCal(valor)
   };
   handleaddFood = () => {
     let newObj = {
@@ -83,14 +105,26 @@ cantidad = (e) => {
 
     var Values = [];
 
+    if (!localStorage.getItem("data")) {
+      Values = foods
+
+
+    } else {
+
+      Values = JSON.parse(localStorage.getItem("data"));
+
+    }
     //get olds values
-    Values = JSON.parse(localStorage.getItem("data"));
 
     //push new value
     Values.push(newObj);
 
     //saved values
     localStorage.setItem("data", JSON.stringify(Values));
+
+    this.setState({
+      allfood: JSON.parse(localStorage.getItem("data"))
+    })
   };
   delete = (item) => {
     var array = [...JSON.parse(localStorage.getItem("data"))]; // make a new copy of array instead of mutating the same array directly.
@@ -100,10 +134,13 @@ cantidad = (e) => {
     this.setState({ allfood: JSON.parse(localStorage.getItem("data")) });
   };
 
+
+
   render() {
+
     console.log(this.state.list);
 
-    const { SearchValue, allfood, nameAdd, calAdd, list, canti } = this.state;
+    const { SearchValue, allfood, nameAdd, calAdd, list, canti, totalCalories } = this.state;
 
     return (
       <div className="root">
@@ -119,7 +156,7 @@ cantidad = (e) => {
               return (
                 <FoodBox
                   key={i}
-                  cantiChange={this.cantidad} 
+                  cantiChange={this.cantidad}
                   onClickElement={() => this.addToList(data)}
                   value={data.canti}
                   onClick={() => this.delete(i)}
@@ -141,15 +178,16 @@ cantidad = (e) => {
 
             <div className="column  content">
               <h2 className="subtitle">Today's foods</h2>
-             
-                 
-                {list.map((data, i) => {
-              return (
-                <Today key={i} name={data.name} cal={data.calories} q={data.quantity} />
-              );
-            })}
-            
-             
+
+
+              {list.map((data, i) => {
+                return (
+                  <Today key={i} name={data.name} cal={data.calories} q={data.quantity} />
+                );
+              })}
+              <h4>{totalCalories}</h4>
+
+
             </div>
           </div>
         </div>
